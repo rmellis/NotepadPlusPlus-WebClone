@@ -42,6 +42,7 @@ Word wrapping in a web browser is notoriously difficult to align with line numbe
 
 ### Vibrant Syntax Highlighting
 The editor intercepts your keystrokes and feeds them through a customized PrismJS lexer. We have overridden the default web-safe colors to perfectly match the harsh, vibrant C++ Scintilla highlighter used in the native desktop app (Pure Blue for tags, Pure Red for attributes, Green for comments).
+
 <img width="895" height="463" alt="image" src="https://github.com/user-attachments/assets/9d114251-79f6-4d1e-8ea4-155f56bbf591" />
 
 ### RTL / LTR Text Direction
@@ -115,6 +116,7 @@ Accessed via **Settings > Preferences**, this draggable modal features a classic
 
 ### Shortcut Mapper
 Found under **Settings > Shortcut Mapper**, this spawns a modal containing a cleanly formatted, scrollable CSS grid documenting all 28 active keyboard shortcuts actively mapped to the application's event listeners.
+
 <img width="500" height="481" alt="image" src="https://github.com/user-attachments/assets/314c36f2-6ba2-4b76-9e6f-1c7b037cffbb" />
 
 
@@ -134,3 +136,24 @@ Because this is a web-browser-based clone, certain native C++ desktop features a
 Rather than clicking a button and having nothing happen, the application features an **Explanation Routing Engine**. When you click an impossible feature (like *Plugins Admin*, *Folder as Workspace*, or *Code Folding*), the engine analyzes the request and spawns a window explaining the exact technical reason why a browser sandbox prevents that specific feature, advising the user to download the native Windows application.
 
 <img width="448" height="240" alt="image" src="https://github.com/user-attachments/assets/08e486a2-29ff-4e26-b243-c498b76b175f" />
+
+## 📂 File Structure
+
+The project has been cleanly separated into three core files for easy reading and maintenance:
+
+* `index.html`: Contains the structural DOM, UI elements, modals, SVG proxy icons, and external library CDN links.
+* `style.css`: Houses the native desktop UI resets, draggable window styling, CSS-grid math variables, and the custom Scintilla-style syntax highlighting overrides.
+* `script.js`: The central brain. Handles array-based state management, DOM manipulation, asynchronous dialog routing, macro recording arrays, and the word-wrap mathematical engine.
+
+## 🚀 How to Run
+
+Because this application relies entirely on client-side Vanilla JavaScript, no build steps, Node packages, or servers are required.
+
+1. Clone or download the repository.
+2. Ensure `index.html`, `style.css`, and `script.js` are in the same folder.
+3. Simply double-click `index.html` to open it in your default web browser.
+
+## 🧰 Built With
+* **HTML5 / CSS3 / Vanilla JavaScript (ES6)**
+* **[PrismJS](https://prismjs.com/):** For base syntax tokenization.
+* **[CryptoJS](https://cryptojs.gitbook.io/docs/):** For the native Hash Generator tools.
