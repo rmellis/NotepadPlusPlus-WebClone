@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8">
     <title>Notepad++ WebApp</title>
-    <meta name="keywords" content="A fully functional, WebApp clone of the classic Notepad++ editor.">
+    <meta name="keywords" content="A fully functional clone of the classic Notepad++ editor as a WebApp.">
     <meta name="author" content="Notepad++ Clone">
     <meta name="theme-color" content="#FFFFFF"> 
 	
@@ -16,13 +16,13 @@
 	<meta property="og:type" content="website">
     <meta property="og:url" content="https://rmellis.github.io/NotepadPlusPlus-WebClone/">
     <meta property="og:title" content="Notepad++ WebApp">
-    <meta property="og:description" content="A fully functional, WebApp clone of the classic Notepad++ editor.">
+    <meta property="og:description" content="A fully functional clone of the classic Notepad++ editor as a WebApp.">
     <meta property="og:image" content="https://rmellis.github.io/NotepadPlusPlus-WebClone/social-share.png">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://rmellis.github.io/NotepadPlusPlus-WebClone/">
     <meta name="twitter:title" content="Notepad++ WebApp">
-    <meta name="twitter:description" content="A fully functional, WebApp clone of the classic Notepad++ editor.">
+    <meta name="twitter:description" content="A fully functional clone of the classic Notepad++ editor as a WebApp.">
     <meta name="twitter:image" content="https://rmellis.github.io/NotepadPlusPlus-WebClone/social-share.png">
 	<link rel="canonical" href="https://rmellis.github.io/NotepadPlusPlus-WebClone/">
 	
@@ -373,13 +373,13 @@
             <div class="menu-item" onclick="requireDesktop('Document List')"><span>Document List</span></div>
             <div class="menu-item" onclick="requireDesktop('Function List')"><span>Function List</span></div>
             <div class="divider"></div>
-            <div class="menu-item"><span>Synchronize Vertical Scrolling</span></div>
-            <div class="menu-item"><span>Synchronize Horizontal Scrolling</span></div>
+            <div class="menu-item" onclick="requireDesktop('Synchronize Vertical Scrolling')"><span>Synchronize Vertical Scrolling</span></div>
+            <div class="menu-item" onclick="requireDesktop('Synchronize Horizontal Scrolling')"><span>Synchronize Horizontal Scrolling</span></div>
             <div class="divider"></div>
             <div class="menu-item" onclick="setTextDirection('rtl')"><span>Text Direction RTL</span><span class="hotkey">Ctrl+Alt+R</span></div>
             <div class="menu-item" onclick="setTextDirection('ltr')"><span>Text Direction LTR</span><span class="hotkey">Ctrl+Alt+L</span></div>
             <div class="divider"></div>
-            <div class="menu-item"><span>Monitoring (tail -f)</span></div>
+            <div class="menu-item" onclick="requireDesktop('Monitoring (tail -f)')"><span>Monitoring (tail -f)</span></div>
         </div>
     </div>
 
@@ -691,6 +691,8 @@
             <div class="menu-item" onclick="window.open('https://npp-user-manual.org/', '_blank')"><span>Notepad++ Online User Manual</span></div>
             <div class="menu-item" onclick="window.open('https://community.notepad-plus-plus.org/', '_blank')"><span>Notepad++ Community (Forum)</span></div>
             <div class="divider"></div>
+            <div class="menu-item" onclick="window.open('https://github.com/rmellis/NotepadPlusPlus-WebClone', '_blank')"><span>Notepad++ Web Clone GitHub</span></div>
+            <div class="divider"></div>
             <div class="menu-item" onclick="customAlert('You are already running the latest version.')"><span>Update Notepad++</span></div>
             <div class="menu-item" onclick="requireDesktop('Network Proxy Settings')"><span>Set Updater Proxy...</span></div>
             <div class="divider"></div>
@@ -722,26 +724,26 @@
     <div class="tool-btn" title="Zoom In" onclick="zoomEditor(1)"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/cqeDtMf.png" alt="Zoom In"></div>
     <div class="tool-btn" title="Zoom Out" onclick="zoomEditor(-1)"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/zLKbvL0.png" alt="Zoom Out"></div>
     <div class="vert-divider"></div>
-    <div class="tool-btn" title="Synchronize vertical scrolling"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/9dm9oC1.png" alt="Sync Vert"></div>
-    <div class="tool-btn" title="Synchronize horizontal scrolling"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/wfHMsv9.png" alt="Sync Horiz"></div>
+    <div class="tool-btn" title="Synchronize vertical scrolling" onclick="requireDesktop('Synchronize Vertical Scrolling')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/9dm9oC1.png" alt="Sync Vert"></div>
+    <div class="tool-btn" title="Synchronize horizontal scrolling" onclick="requireDesktop('Synchronize Horizontal Scrolling')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/wfHMsv9.png" alt="Sync Horiz"></div>
     <div class="vert-divider"></div>
     <div class="tool-btn" title="Word Wrap" onclick="toggleWordWrap()" id="btn-word-wrap"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/4sCpjpe.png" alt="Word Wrap"></div>
-    <div class="tool-btn" title="Show all characters"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/EiyCRwB.png" alt="Show All Chars"></div>
+    <div class="tool-btn" title="Show all characters" onclick="requireDesktop('Render CR/LF Symbols')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/EiyCRwB.png" alt="Show All Chars"></div>
     <div class="tool-btn" title="Show indent guide" style="background-color: #d0e8ff; border: 1px solid #a0a0a0;" id="btn-line-num" onclick="toggleLineNumbers()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/7qo4TpS.png" alt="Indent Guide"></div>
     <div class="vert-divider"></div>
-    <div class="tool-btn" title="Define your language"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/sAvABwd.png" alt="Language"></div>
-    <div class="tool-btn" title="Document Map"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/rju4SYE.png" alt="Doc Map"></div>
-    <div class="tool-btn" title="Document List"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/aJPISzB.png" alt="Doc List"></div>
-    <div class="tool-btn" title="Function List"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/m7yeZ6U.png" alt="Function List"></div>
-    <div class="tool-btn" title="Document as Workspace"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/IRwuQz2.png" alt="Workspace"></div>
+    <div class="tool-btn" title="Define your language" onclick="requireDesktop('User Defined Languages')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/sAvABwd.png" alt="Language"></div>
+    <div class="tool-btn" title="Document Map" onclick="requireDesktop('Document Map')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/rju4SYE.png" alt="Doc Map"></div>
+    <div class="tool-btn" title="Document List" onclick="requireDesktop('Document List')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/aJPISzB.png" alt="Doc List"></div>
+    <div class="tool-btn" title="Function List" onclick="requireDesktop('Function List')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/m7yeZ6U.png" alt="Function List"></div>
+    <div class="tool-btn" title="Document as Workspace" onclick="requireDesktop('Folder as Workspace')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/IRwuQz2.png" alt="Workspace"></div>
     <div class="vert-divider"></div>
-    <div class="tool-btn" title="Monitoring (tail -f)"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/Mn88Prq.png" alt="Tail"></div>
+    <div class="tool-btn" title="Monitoring (tail -f)" onclick="requireDesktop('Monitoring (tail -f)')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/Mn88Prq.png" alt="Tail"></div>
     <div class="vert-divider"></div>
     <div class="tool-btn" title="Start Recording" onclick="startMacroRecording()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/YETvyfq.png" alt="Record"></div>
     <div class="tool-btn" title="Stop Recording" onclick="stopMacroRecording()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/jyuXmZz.png" alt="Stop"></div>
     <div class="tool-btn" title="Playback" onclick="playbackMacro()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/Guh5yot.png" alt="Play"></div>
     <div class="tool-btn" title="Run a macro multiple times..." onclick="runMacroMultiple()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/DBj2Cnl.png" alt="Run Multiple"></div>
-    <div class="tool-btn" title="Save current recorded macro"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/j0lBrLd.png" alt="Save Macro"></div>
+    <div class="tool-btn" title="Save current recorded macro" onclick="requireDesktop('Save Current Recorded Macro')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/j0lBrLd.png" alt="Save Macro"></div>
 </div>
 
 <div id="tabbar"></div>
@@ -813,7 +815,7 @@
         <h2 style="color: #0078d7; margin-bottom: 10px;">Notepad++ Web Clone</h2>
         <p style="margin-bottom: 5px;">Built with HTML, CSS, and vanilla JS.</p>
         <p style="margin-bottom: 15px;">Version 1.0 (Web Edition)</p>
-        <button onclick="closeAboutModal()" style="padding: 4px 20px; cursor: pointer;">OK</button>
+        <button onclick="closeAboutModal()" style="padding: 4px 20px; cursor: default;">OK</button>
     </div>
 </div>
 

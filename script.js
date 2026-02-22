@@ -575,10 +575,49 @@ function renderTabs() {
             }
         };
         
+        // --- Drag and Drop for Tabs ---
+        tabEl.draggable = true;
+        
+        tabEl.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', tab.id);
+            setTimeout(() => tabEl.classList.add('dragging'), 0);
+        });
+        
+        tabEl.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            tabEl.classList.add('drag-over');
+        });
+        
+        tabEl.addEventListener('dragleave', (e) => {
+            tabEl.classList.remove('drag-over');
+        });
+        
+        tabEl.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation(); 
+            tabEl.classList.remove('drag-over');
+            const draggedId = e.dataTransfer.getData('text/plain');
+            if (draggedId && draggedId !== tab.id) {
+                const draggedIndex = tabs.findIndex(t => t.id === draggedId);
+                const targetIndex = tabs.findIndex(t => t.id === tab.id);
+                if (draggedIndex !== -1 && targetIndex !== -1) {
+                    const [draggedTab] = tabs.splice(draggedIndex, 1);
+                    tabs.splice(targetIndex, 0, draggedTab);
+                    renderTabs();
+                }
+            }
+        });
+        
+        tabEl.addEventListener('dragend', (e) => {
+            tabEl.classList.remove('dragging');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('drag-over'));
+        });
+        // ------------------------------
+        
         tabEl.innerHTML = `
             <img src="${iconSrc}" class="floppy-icon ${iconClass}" alt="save state">
             <span class="tab-title">${tab.title}</span>
-            <span class="tab-close" onclick="closeTab(event, '${tab.id}')">✖</span>
+            <span class="tab-close" onclick="closeTab(event, '${tab.id}')"></span>
         `;
         tabbar.appendChild(tabEl);
     });
@@ -1431,6 +1470,24 @@ function centerModal(modal) {
 
 document.addEventListener('DOMContentLoaded', () => {
     
+    // Tabbar Drop Logic (Snap to the end)
+    tabbar.addEventListener('dragover', (e) => {
+        e.preventDefault();
+    });
+
+    tabbar.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const draggedId = e.dataTransfer.getData('text/plain');
+        if (draggedId) {
+            const draggedIndex = tabs.findIndex(t => t.id === draggedId);
+            if (draggedIndex !== -1) {
+                const [draggedTab] = tabs.splice(draggedIndex, 1);
+                tabs.push(draggedTab);
+                renderTabs();
+            }
+        }
+    });
+
     // Modal Drag Logic
     document.querySelectorAll('.modal').forEach(modal => {
         const header = modal.querySelector('.modal-header');
