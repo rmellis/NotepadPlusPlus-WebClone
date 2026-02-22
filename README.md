@@ -1,4 +1,4 @@
-# <img width="32" alt="icon" src="https://github.com/user-attachments/assets/97be996c-9358-413e-9c94-7476f3555194" />  Notepad++ Web Clone:  Documentation
+# <img width="32" alt="icon" src="https://github.com/user-attachments/assets/97be996c-9358-413e-9c94-7476f3555194" />  Notepad++ Web Clone
 
 This is the guide for the Notepad++ Web Clone. This application is a fully client-side web application designed to meticulously replicate the look, feel, and functionality of the classic Notepad++ desktop software within a browser sandbox.
 
