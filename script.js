@@ -27,7 +27,7 @@ function closeMsgBox(result = null) {
 
 window.customAlert = function(msg) {
     return new Promise(resolve => {
-        document.getElementById('msg-box-title').textContent = 'Notepad++ Web Clone';
+        document.getElementById('msg-box-title').textContent = 'Notepad++ Web';
         document.getElementById('msg-box-text').textContent = msg;
         document.getElementById('msg-box-input-container').style.display = 'none';
         document.getElementById('msg-box-actions').innerHTML = `<button onclick="closeMsgBox(true)" style="padding: 4px 20px;">OK</button>`;
@@ -364,7 +364,7 @@ function setLanguage(lang) {
     let langDisplay = lang === 'none' ? 'Normal text file' : lang.toUpperCase() + ' source file';
     sbType.textContent = langDisplay;
     
-    document.title = `${currentTab.title} - Notepad++ Clone`;
+    document.title = `${currentTab.title} - Notepad++`;
 }
 
 // --- Encoding Management ---
@@ -377,7 +377,7 @@ function setEncoding(enc) {
     
     updateMenuCheckmarks('enc-check', enc);
     sbEncoding.textContent = enc;
-    document.title = `${currentTab.title} - Notepad++ Clone`;
+    document.title = `${currentTab.title} - Notepad++`;
 }
 
 function convertEncoding(enc) {
@@ -624,7 +624,7 @@ function renderTabs() {
     
     const activeTab = getActiveTab();
     if(activeTab) {
-        document.title = `${activeTab.isSaved ? '' : '*'}${activeTab.title} - Notepad++ Clone`;
+        document.title = `${activeTab.isSaved ? '' : '*'}${activeTab.title} - Notepad++`;
     }
 }
 
