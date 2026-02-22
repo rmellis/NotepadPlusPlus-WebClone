@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Notepad++ Clone -Functional</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <div id="df-exit-hint" onclick="exitDistractionFree()">Press ESC or Click to Exit</div>
+
+<input type="file" id="fileInput" style="display: none;" onchange="handleFileOpen(event)">
+<input type="file" id="sessionInput" style="display: none;" accept=".json" onchange="handleSessionLoad(event)">
+
+<div id="menubar">
+    <div class="menu-root">File
+        <div class="dropdown">
+            <div class="menu-item" onclick="newTab()">
+                <span>New</span><span class="hotkey">Ctrl+N</span>
+            </div>
+            <div class="menu-item" onclick="triggerFileOpen()">
+                <span>Open</span><span class="hotkey">Ctrl+O</span>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Open Containing Folder</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="requireDesktop('Windows Explorer')"><span>Explorer</span></div>
+                    <div class="menu-item" onclick="requireDesktop('Command Prompt')"><span>cmd</span></div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="viewInChrome()">
+                <span>Open in Default Viewer</span>
+            </div>
+            <div class="menu-item" onclick="requireDesktop('Folder as Workspace')">
+                <span>Open Folder as Workspace...</span>
+            </div>
+            <div class="menu-item">
+                <span>Reload from Disk</span><span class="hotkey">Ctrl+R</span>
+            </div>
+            <div class="menu-item" onclick="saveCurrentFile()">
+                <span>Save</span><span class="hotkey">Ctrl+S</span>
+            </div>
+            <div class="menu-item" onclick="saveAsFile()">
+                <span>Save As</span><span class="hotkey">Ctrl+Alt+S</span>
+            </div>
+            <div class="menu-item" onclick="saveCopyAs()">
+                <span>Save Copy As</span>
+            </div>
+            <div class="menu-item" onclick="saveAllFiles()">
+                <span>Save All</span><span class="hotkey">Ctrl+Shift+S</span>
+            </div>
+            <div class="menu-item" onclick="renameActiveTab()">
+                <span>Rename...</span>
+            </div>
+            <div class="menu-item" onclick="closeActiveTab()">
+                <span>Close</span><span class="hotkey">Ctrl+W</span>
+            </div>
+            <div class="menu-item" onclick="closeAllTabs()">
+                <span>Close All</span><span class="hotkey">Ctrl+Shift+W</span>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Close multiple Documents</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="closeAllButThis()"><span>Close All but This</span></div>
+                    <div class="menu-item" onclick="closeAllToLeft()"><span>Close All to Left</span></div>
+                    <div class="menu-item" onclick="closeAllToRight()"><span>Close All to Right</span></div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="moveToRecycleBin()">
+                <span>Move to Recycle Bin</span>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="triggerSessionLoad()"><span>Load Session...</span></div>
+            <div class="menu-item" onclick="saveSession()"><span>Save Session...</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="window.print()">
+                <span>Print</span><span class="hotkey">Ctrl+P</span>
+            </div>
+            <div class="menu-item" onclick="window.print()">
+                <span>Print Now</span>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item">
+                <span>Restore Recent Closed File</span><span class="hotkey">Ctrl+Shift+T</span>
+            </div>
+            <div class="menu-item"><span>Open All Recent Files</span></div>
+            <div class="menu-item" onclick="emptyRecentFiles()"><span>Empty Recent Files List</span></div>
+            <div class="divider"></div>
+            <div class="menu-item">
+                <span>Exit</span><span class="hotkey">Alt+F4</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="menu-root">Edit
+        <div class="dropdown">
+            <div class="menu-item" onclick="document.execCommand('undo')">
+                <span>Undo</span><span class="hotkey">Ctrl+Z</span>
+            </div>
+            <div class="menu-item" onclick="document.execCommand('redo')">
+                <span>Redo</span><span class="hotkey">Ctrl+Y</span>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="document.execCommand('cut')">
+                <span>Cut</span><span class="hotkey">Ctrl+X</span>
+            </div>
+            <div class="menu-item" onclick="document.execCommand('copy')">
+                <span>Copy</span><span class="hotkey">Ctrl+C</span>
+            </div>
+            <div class="menu-item" onclick="document.execCommand('paste')">
+                <span>Paste</span><span class="hotkey">Ctrl+V</span>
+            </div>
+            <div class="menu-item" onclick="document.execCommand('delete')">
+                <span>Delete</span><span class="hotkey">DEL</span>
+            </div>
+            <div class="menu-item" onclick="document.getElementById('editor').select()">
+                <span>Select All</span><span class="hotkey">Ctrl+A</span>
+            </div>
+            <div class="menu-item" onclick="requireDesktop('Begin/End Select')">
+                <span>Begin/End Select</span><span class="hotkey">Ctrl+Shift+B</span>
+            </div>
+            <div class="menu-item" onclick="requireDesktop('Column Mode')">
+                <span>Begin/End Select in Column Mode</span><span class="hotkey">Alt+Shift+B</span>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>Insert</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="insertDateTime()"><span>Date Time (short)</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Copy to clipboard</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="copyFullPath()"><span>Copy Full File Path</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Indent</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="increaseIndent()"><span>Increase Indent</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Convert Case To</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="convertCase('upper')"><span>UPPERCASE</span></div>
+                    <div class="menu-item" onclick="convertCase('lower')"><span>lowercase</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Line Operations</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="duplicateCurrentLine()"><span>Duplicate Current Line</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Comment / Uncomment</span>
+                <div class="submenu">
+                    <div class="menu-item"><span>Toggle Single Line Comment</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Auto-Completion</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="requireDesktop('Function Auto-Completion')"><span>Function Completion</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>EOL Conversion</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setEOL('Windows (CR LF)')"><span>Windows (CR LF)</span></div>
+                    <div class="menu-item" onclick="setEOL('Unix (LF)')"><span>Unix (LF)</span></div>
+                    <div class="menu-item" onclick="setEOL('Macintosh (CR)')"><span>Macintosh (CR)</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Blank Operations</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="trimTrailingSpace()"><span>Trim Trailing Space</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Paste Special</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="requireDesktop('Clipboard HTML Parsing')"><span>Paste HTML Content</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>On Selection</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="requireDesktop('OS File Execution')"><span>Open File</span></div>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>Multi-Select All</span>
+                <div class="submenu">
+                    <div class="menu-item"><span>Match Case</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Multi-Select Next</span>
+                <div class="submenu">
+                    <div class="menu-item"><span>Match Case</span></div>
+                </div>
+            </div>
+            <div class="menu-item"><span>Undo the Latest Added Multi-select</span></div>
+            <div class="menu-item"><span>Skip Current & Go to Next Multi-select</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="requireDesktop('Column Mode')"><span>Column Mode...</span></div>
+            <div class="menu-item" onclick="requireDesktop('Column Editor')"><span>Column Editor...</span><span class="hotkey">Alt+C</span></div>
+            <div class="menu-item" onclick="requireDesktop('Character Panel')"><span>Character Panel</span></div>
+            <div class="menu-item" onclick="requireDesktop('OS Clipboard History')"><span>Clipboard History</span></div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>Read Only in Notepad++</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="toggleReadOnly()"><span>Set Read-Only</span></div>
+                </div>
+            </div>
+            <div class="menu-item"><span>Read Only Attribute in Windows</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">Search
+        <div class="dropdown">
+            <div class="menu-item" onclick="showFindModal(false)"><span>Find...</span><span class="hotkey">Ctrl+F</span></div>
+            <div class="menu-item" onclick="requireDesktop('Find in Files')"><span>Find in Files...</span><span class="hotkey">Ctrl+Shift+F</span></div>
+            <div class="menu-item" onclick="doFindNext()"><span>Find Next</span><span class="hotkey">F3</span></div>
+            <div class="menu-item" onclick="requireDesktop('Reverse Search Engine')"><span>Find Previous</span><span class="hotkey">Shift+F3</span></div>
+            <div class="menu-item"><span>Select and Find Next</span><span class="hotkey">Ctrl+F3</span></div>
+            <div class="menu-item"><span>Select and Find Previous</span><span class="hotkey">Ctrl+Shift+F3</span></div>
+            <div class="menu-item"><span>Find (Volatile) Next</span><span class="hotkey">Ctrl+Alt+F3</span></div>
+            <div class="menu-item"><span>Find (Volatile) Previous</span><span class="hotkey">Ctrl+Alt+Shift+F3</span></div>
+            <div class="menu-item" onclick="showFindModal(true)"><span>Replace...</span><span class="hotkey">Ctrl+H</span></div>
+            <div class="menu-item"><span>Incremental Search</span><span class="hotkey">Ctrl+Alt+I</span></div>
+            <div class="menu-item"><span>Search Result Window</span><span class="hotkey">F7</span></div>
+            <div class="menu-item"><span>Next search result</span><span class="hotkey">F4</span></div>
+            <div class="menu-item"><span>Previous Search Result</span><span class="hotkey">Shift+F4</span></div>
+            <div class="menu-item" onclick="goToLine()"><span>Go to...</span><span class="hotkey">Ctrl+G</span></div>
+            <div class="menu-item" onclick="requireDesktop('Bracket Matching Selection')"><span>Select All in-between {} [] or ()</span><span class="hotkey">Ctrl+Alt+B</span></div>
+            <div class="menu-item" onclick="requireDesktop('Gutter Marking')"><span>Mark</span><span class="hotkey">Ctrl+M</span></div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>Change History</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="requireDesktop('Change History')"><span>Toggle Change History</span></div>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>Style All Occurrences of Token</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Lexer Token Styling')"><span>Using 1st Style</span></div></div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Style One Token</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Lexer Token Styling')"><span>Using 1st Style</span></div></div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Clear Style</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Lexer Token Styling')"><span>Clear 1st Style</span></div></div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Jump Up</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Lexer Token Styling')"><span>1st Style</span></div></div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Jump Down</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Lexer Token Styling')"><span>1st Style</span></div></div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Copy Styled Text</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Lexer Token Styling')"><span>1st Style</span></div></div>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>Bookmark</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Gutter Bookmarks')"><span>Toggle Bookmark</span></div></div>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="requireDesktop('Hex Range Search')"><span>Find Characters in range...</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">View
+        <div class="dropdown">
+            <div class="menu-item" onclick="requireDesktop('Always on Top')"><span>Always on Top</span></div>
+            <div class="menu-item" onclick="toggleFullScreen()"><span>Toggle FullScreen Mode</span><span class="hotkey">F11</span></div>
+            <div class="menu-item" onclick="togglePostIt()"><span>Post-It</span><span class="hotkey">F12</span></div>
+            <div class="menu-item" onclick="toggleDistractionFree()"><span>Distraction Free Mode</span></div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>View Current File In</span>
+                <div class="submenu"><div class="menu-item" onclick="viewInChrome()"><span>Chrome</span></div></div>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>Show Symbol</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Render CR/LF Symbols')"><span>Show All Characters</span></div></div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Zoom</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="zoomEditor(1)"><span>Zoom In</span></div>
+                    <div class="menu-item" onclick="zoomEditor(-1)"><span>Zoom Out</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Move/Clone Current Document</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Split Screen Views')"><span>Move to Other View</span></div></div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Tab</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Close Multiple Tabs Panel')"><span>Close Multiple Tabs</span></div></div>
+            </div>
+            <div class="menu-item" onclick="toggleWordWrap()">
+                <span class="check-icon" id="view-check-wordwrap"></span><span>Word Wrap</span>
+            </div>
+            <div class="menu-item" onclick="requireDesktop('Split Screen Views')"><span>Focus on Another View</span><span class="hotkey">F8</span></div>
+            <div class="menu-item" onclick="requireDesktop('Hide Lines')"><span>Hide Lines</span><span class="hotkey">Alt+H</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="requireDesktop('Code Folding')"><span>Fold All</span></div>
+            <div class="menu-item" onclick="requireDesktop('Code Folding')"><span>Unfold All</span></div>
+            <div class="menu-item" onclick="requireDesktop('Code Folding')"><span>Fold Current Level</span><span class="hotkey">Ctrl+Alt+F</span></div>
+            <div class="menu-item" onclick="requireDesktop('Code Folding')"><span>Unfold Current Level</span><span class="hotkey">Ctrl+Alt+Shift+F</span></div>
+            <div class="menu-item has-submenu">
+                <span>Fold Level</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Code Folding')"><span>1</span></div></div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Unfold Level</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Code Folding')"><span>1</span></div></div>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="showSummary()"><span>Summary</span></div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>Project Panels</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('Project Panels')"><span>Project Panel 1</span></div></div>
+            </div>
+            <div class="menu-item" onclick="requireDesktop('Folder as Workspace')"><span>Folder as Workspace</span></div>
+            <div class="menu-item" onclick="requireDesktop('Document Map')"><span>Document Map</span></div>
+            <div class="menu-item" onclick="requireDesktop('Document List')"><span>Document List</span></div>
+            <div class="menu-item" onclick="requireDesktop('Function List')"><span>Function List</span></div>
+            <div class="divider"></div>
+            <div class="menu-item"><span>Synchronize Vertical Scrolling</span></div>
+            <div class="menu-item"><span>Synchronize Horizontal Scrolling</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="setTextDirection('rtl')"><span>Text Direction RTL</span><span class="hotkey">Ctrl+Alt+R</span></div>
+            <div class="menu-item" onclick="setTextDirection('ltr')"><span>Text Direction LTR</span><span class="hotkey">Ctrl+Alt+L</span></div>
+            <div class="divider"></div>
+            <div class="menu-item"><span>Monitoring (tail -f)</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">Encoding
+        <div class="dropdown" id="encoding-dropdown">
+            <div class="menu-item" onclick="setEncoding('ANSI')">
+                <span class="check-icon" id="enc-check-ANSI"></span><span>ANSI</span>
+            </div>
+            <div class="menu-item" onclick="setEncoding('UTF-8')">
+                <span class="check-icon" id="enc-check-UTF-8"></span><span>UTF-8 (default)</span>
+            </div>
+            <div class="menu-item" onclick="setEncoding('UTF-8 BOM')">
+                <span class="check-icon" id="enc-check-UTF-8 BOM"></span><span>UTF-8 BOM</span>
+            </div>
+            <div class="menu-item" onclick="setEncoding('UTF-16 BE BOM')">
+                <span class="check-icon" id="enc-check-UTF-16 BE BOM"></span><span>UTF-16 BE BOM</span>
+            </div>
+            <div class="menu-item" onclick="setEncoding('UTF-16 LE BOM')">
+                <span class="check-icon" id="enc-check-UTF-16 LE BOM"></span><span>UTF-16 LE BOM</span>
+            </div>
+            <div class="menu-item"><span>Character sets</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="convertEncoding('ANSI')"><span>Convert to ANSI</span></div>
+            <div class="menu-item" onclick="convertEncoding('UTF-8')"><span>Convert to UTF-8</span></div>
+            <div class="menu-item" onclick="convertEncoding('UTF-8 BOM')"><span>Convert to UTF-8-BOM</span></div>
+            <div class="menu-item" onclick="convertEncoding('UTF-16 BE BOM')"><span>Convert to UTF-16 BE BOM</span></div>
+            <div class="menu-item" onclick="convertEncoding('UTF-16 LE BOM')"><span>Convert to UTF-16 LE BOM</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">Language
+        <div class="dropdown" id="language-dropdown">
+            <div class="menu-item" onclick="setLanguage('none')">
+                <span class="check-icon" id="lang-check-none"></span><span>None (Normal Text)</span>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>A</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('actionscript')"><span class="check-icon" id="lang-check-actionscript"></span><span>ActionScript</span></div>
+                    <div class="menu-item" onclick="setLanguage('ada')"><span class="check-icon" id="lang-check-ada"></span><span>Ada</span></div>
+                    <div class="menu-item" onclick="setLanguage('asn1')"><span class="check-icon" id="lang-check-asn1"></span><span>ASN.1</span></div>
+                    <div class="menu-item" onclick="setLanguage('aspnet')"><span class="check-icon" id="lang-check-aspnet"></span><span>ASP</span></div>
+                    <div class="menu-item" onclick="setLanguage('nasm')"><span class="check-icon" id="lang-check-nasm"></span><span>Assembly</span></div>
+                    <div class="menu-item" onclick="setLanguage('autoit')"><span class="check-icon" id="lang-check-autoit"></span><span>AutoIt</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>B</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('bash')"><span class="check-icon" id="lang-check-bash"></span><span>Bash</span></div>
+                    <div class="menu-item" onclick="setLanguage('batch')"><span class="check-icon" id="lang-check-batch"></span><span>Batch</span></div>
+                    <div class="menu-item" onclick="setLanguage('basic')"><span class="check-icon" id="lang-check-basic"></span><span>Basic</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>C</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('c')"><span class="check-icon" id="lang-check-c"></span><span>C</span></div>
+                    <div class="menu-item" onclick="setLanguage('cpp')"><span class="check-icon" id="lang-check-cpp"></span><span>C++</span></div>
+                    <div class="menu-item" onclick="setLanguage('csharp')"><span class="check-icon" id="lang-check-csharp"></span><span>C#</span></div>
+                    <div class="menu-item" onclick="setLanguage('cmake')"><span class="check-icon" id="lang-check-cmake"></span><span>CMake</span></div>
+                    <div class="menu-item" onclick="setLanguage('cobol')"><span class="check-icon" id="lang-check-cobol"></span><span>COBOL</span></div>
+                    <div class="menu-item" onclick="setLanguage('coffeescript')"><span class="check-icon" id="lang-check-coffeescript"></span><span>CoffeeScript</span></div>
+                    <div class="menu-item" onclick="setLanguage('css')"><span class="check-icon" id="lang-check-css"></span><span>CSS</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>D</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('d')"><span class="check-icon" id="lang-check-d"></span><span>D</span></div>
+                    <div class="menu-item" onclick="setLanguage('dart')"><span class="check-icon" id="lang-check-dart"></span><span>Dart</span></div>
+                    <div class="menu-item" onclick="setLanguage('diff')"><span class="check-icon" id="lang-check-diff"></span><span>Diff</span></div>
+                    <div class="menu-item" onclick="setLanguage('docker')"><span class="check-icon" id="lang-check-docker"></span><span>Docker</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>E</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('elixir')"><span class="check-icon" id="lang-check-elixir"></span><span>Elixir</span></div>
+                    <div class="menu-item" onclick="setLanguage('elm')"><span class="check-icon" id="lang-check-elm"></span><span>Elm</span></div>
+                    <div class="menu-item" onclick="setLanguage('erlang')"><span class="check-icon" id="lang-check-erlang"></span><span>Erlang</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>F</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('fsharp')"><span class="check-icon" id="lang-check-fsharp"></span><span>F#</span></div>
+                    <div class="menu-item" onclick="setLanguage('fortran')"><span class="check-icon" id="lang-check-fortran"></span><span>Fortran</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>G</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('go')"><span class="check-icon" id="lang-check-go"></span><span>Go</span></div>
+                    <div class="menu-item" onclick="setLanguage('graphql')"><span class="check-icon" id="lang-check-graphql"></span><span>GraphQL</span></div>
+                    <div class="menu-item" onclick="setLanguage('groovy')"><span class="check-icon" id="lang-check-groovy"></span><span>Groovy</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>H</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('haskell')"><span class="check-icon" id="lang-check-haskell"></span><span>Haskell</span></div>
+                    <div class="menu-item" onclick="setLanguage('hollywood')"><span class="check-icon" id="lang-check-hollywood"></span><span>Hollywood</span></div>
+                    <div class="menu-item" onclick="setLanguage('html')"><span class="check-icon" id="lang-check-html"></span><span>HTML</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>I</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('ini')"><span class="check-icon" id="lang-check-ini"></span><span>INI file</span></div>
+                    <div class="menu-item" onclick="setLanguage('icon')"><span class="check-icon" id="lang-check-icon"></span><span>Icon</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>J</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('java')"><span class="check-icon" id="lang-check-java"></span><span>Java</span></div>
+                    <div class="menu-item" onclick="setLanguage('javascript')"><span class="check-icon" id="lang-check-javascript"></span><span>JavaScript</span></div>
+                    <div class="menu-item" onclick="setLanguage('json')"><span class="check-icon" id="lang-check-json"></span><span>JSON</span></div>
+                    <div class="menu-item" onclick="setLanguage('jsx')"><span class="check-icon" id="lang-check-jsx"></span><span>JSX</span></div>
+                    <div class="menu-item" onclick="setLanguage('julia')"><span class="check-icon" id="lang-check-julia"></span><span>Julia</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>K</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('kotlin')"><span class="check-icon" id="lang-check-kotlin"></span><span>Kotlin</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>L</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('latex')"><span class="check-icon" id="lang-check-latex"></span><span>LaTeX</span></div>
+                    <div class="menu-item" onclick="setLanguage('less')"><span class="check-icon" id="lang-check-less"></span><span>Less</span></div>
+                    <div class="menu-item" onclick="setLanguage('lisp')"><span class="check-icon" id="lang-check-lisp"></span><span>LISP</span></div>
+                    <div class="menu-item" onclick="setLanguage('lua')"><span class="check-icon" id="lang-check-lua"></span><span>Lua</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>M</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('makefile')"><span class="check-icon" id="lang-check-makefile"></span><span>Makefile</span></div>
+                    <div class="menu-item" onclick="setLanguage('markdown')"><span class="check-icon" id="lang-check-markdown"></span><span>Markdown</span></div>
+                    <div class="menu-item" onclick="setLanguage('matlab')"><span class="check-icon" id="lang-check-matlab"></span><span>MATLAB</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>N</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('nim')"><span class="check-icon" id="lang-check-nim"></span><span>Nim</span></div>
+                    <div class="menu-item" onclick="setLanguage('nix')"><span class="check-icon" id="lang-check-nix"></span><span>Nix</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>O</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('objectivec')"><span class="check-icon" id="lang-check-objectivec"></span><span>Objective-C</span></div>
+                    <div class="menu-item" onclick="setLanguage('ocaml')"><span class="check-icon" id="lang-check-ocaml"></span><span>OCaml</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>P</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('pascal')"><span class="check-icon" id="lang-check-pascal"></span><span>Pascal</span></div>
+                    <div class="menu-item" onclick="setLanguage('perl')"><span class="check-icon" id="lang-check-perl"></span><span>Perl</span></div>
+                    <div class="menu-item" onclick="setLanguage('php')"><span class="check-icon" id="lang-check-php"></span><span>PHP</span></div>
+                    <div class="menu-item" onclick="setLanguage('powershell')"><span class="check-icon" id="lang-check-powershell"></span><span>PowerShell</span></div>
+                    <div class="menu-item" onclick="setLanguage('python')"><span class="check-icon" id="lang-check-python"></span><span>Python</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>R</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('r')"><span class="check-icon" id="lang-check-r"></span><span>R</span></div>
+                    <div class="menu-item" onclick="setLanguage('ruby')"><span class="check-icon" id="lang-check-ruby"></span><span>Ruby</span></div>
+                    <div class="menu-item" onclick="setLanguage('rust')"><span class="check-icon" id="lang-check-rust"></span><span>Rust</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>S</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('sass')"><span class="check-icon" id="lang-check-sass"></span><span>Sass</span></div>
+                    <div class="menu-item" onclick="setLanguage('scala')"><span class="check-icon" id="lang-check-scala"></span><span>Scala</span></div>
+                    <div class="menu-item" onclick="setLanguage('scheme')"><span class="check-icon" id="lang-check-scheme"></span><span>Scheme</span></div>
+                    <div class="menu-item" onclick="setLanguage('sql')"><span class="check-icon" id="lang-check-sql"></span><span>SQL</span></div>
+                    <div class="menu-item" onclick="setLanguage('swift')"><span class="check-icon" id="lang-check-swift"></span><span>Swift</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>T</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('tcl')"><span class="check-icon" id="lang-check-tcl"></span><span>TCL</span></div>
+                    <div class="menu-item" onclick="setLanguage('tsx')"><span class="check-icon" id="lang-check-tsx"></span><span>TSX</span></div>
+                    <div class="menu-item" onclick="setLanguage('typescript')"><span class="check-icon" id="lang-check-typescript"></span><span>TypeScript</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>V</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="setLanguage('visual-basic')"><span class="check-icon" id="lang-check-visual-basic"></span><span>Visual Basic</span></div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="setLanguage('xml')"><span class="check-icon" id="lang-check-xml"></span><span>XML</span></div>
+            <div class="menu-item" onclick="setLanguage('yaml')"><span class="check-icon" id="lang-check-yaml"></span><span>YAML</span></div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>User Defined Language</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('User Defined Languages')"><span>Define your language...</span></div></div>
+            </div>
+            <div class="menu-item" onclick="setLanguage('markdown')"><span>Markdown (preinstalled)</span></div>
+            <div class="menu-item" onclick="requireDesktop('Dark Mode Engine')"><span>Markdown (Preinstalled dark mode)</span></div>
+            <div class="menu-item" onclick="requireDesktop('User Defined Languages')"><span>User-Defined</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">Settings
+        <div class="dropdown">
+            <div class="menu-item" onclick="showPrefModal()"><span>Preferences...</span></div>
+            <div class="menu-item" onclick="requireDesktop('Style Configurator')"><span>Style Configurator...</span></div>
+            <div class="menu-item" onclick="showShortcutModal()"><span>Shortcut Mapper...</span></div>
+            <div class="divider"></div>
+            <div class="menu-item has-submenu">
+                <span>Import</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="showPluginsInfo()"><span>Import plugin(s)...</span></div>
+                    <div class="menu-item" onclick="requireDesktop('Theme Import')"><span>Import style theme(s)...</span></div>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="requireDesktop('Context Menu Customization')"><span>Edit Popup ContextMenu</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">Tools
+        <div class="dropdown">
+            <div class="menu-item has-submenu"><span>MD5</span><div class="submenu"><div class="menu-item" onclick="generateHash('MD5')"><span>Generate...</span></div></div></div>
+            <div class="menu-item has-submenu"><span>SHA-1</span><div class="submenu"><div class="menu-item" onclick="generateHash('SHA-1')"><span>Generate...</span></div></div></div>
+            <div class="menu-item has-submenu"><span>SHA-256</span><div class="submenu"><div class="menu-item" onclick="generateHash('SHA-256')"><span>Generate...</span></div></div></div>
+            <div class="menu-item has-submenu"><span>SHA-512</span><div class="submenu"><div class="menu-item" onclick="generateHash('SHA-512')"><span>Generate...</span></div></div></div>
+        </div>
+    </div>
+
+    <div class="menu-root">Macro
+        <div class="dropdown">
+            <div class="menu-item" onclick="startMacroRecording()"><span>Start Recording</span></div>
+            <div class="menu-item" onclick="stopMacroRecording()"><span>Stop Recording</span></div>
+            <div class="menu-item" onclick="playbackMacro()"><span>Playback</span><span class="hotkey">Ctrl+Shift+P</span></div>
+            <div class="menu-item"><span>Save Current Recorded Macro...</span></div>
+            <div class="menu-item" onclick="runMacroMultiple()"><span>Run a Macro Multiple Times...</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="trimTrailingSpace(); saveCurrentFile();"><span>Trim Trailing Space and Save</span><span class="hotkey">Alt+Shift+S</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="showShortcutModal()"><span>Modify Shortcut/Delete Macro...</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">Run
+        <div class="dropdown">
+            <div class="menu-item" onclick="triggerRun()"><span>Run...</span><span class="hotkey">F5</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="getPhpHelp()"><span>Get PHP help</span><span class="hotkey">Alt+F1</span></div>
+            <div class="menu-item" onclick="wikipediaSearch()"><span>Wikipedia Search</span><span class="hotkey">Alt+F3</span></div>
+            <div class="menu-item" onclick="requireDesktop('Open in New Instance')"><span>Open selected file path in new instance</span><span class="hotkey">Alt+F6</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="showShortcutModal()"><span>Modify Shortcut/Delete Command...</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">Plugins
+        <div class="dropdown">
+            <div class="menu-item has-submenu">
+                <span>MIME Tools</span>
+                <div class="submenu">
+                    <div class="menu-item" onclick="performBase64Encode()"><span>Base64 Encode</span></div>
+                    <div class="menu-item" onclick="performBase64Decode()"><span>Base64 Decode</span></div>
+                </div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>Converter</span>
+                <div class="submenu"><div class="menu-item" onclick="convertToHex()"><span>ASCII -> HEX</span></div></div>
+            </div>
+            <div class="menu-item has-submenu">
+                <span>NppExport</span>
+                <div class="submenu"><div class="menu-item" onclick="requireDesktop('RTF Export Plugin')"><span>Export to RTF</span></div></div>
+            </div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="requireDesktop('Plugins Admin')"><span>Plugins Admin...</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="showPluginsInfo()"><span>Open Plugins Folder...</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">Window
+        <div class="dropdown">
+            <div class="menu-item has-submenu">
+                <span>Sort By</span>
+                <div class="submenu"><div class="menu-item" onclick="sortTabsAlphabetically()"><span>Name A to Z</span></div></div>
+            </div>
+            <div class="menu-item" onclick="requireDesktop('Window Manager')"><span>Windows...</span></div>
+        </div>
+    </div>
+
+    <div class="menu-root">?
+        <div class="dropdown">
+            <div class="menu-item" onclick="showCmdModal()"><span>Command Line Arguments...</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="window.open('https://notepad-plus-plus.org/', '_blank')"><span>Notepad++ Home</span></div>
+            <div class="menu-item" onclick="window.open('https://github.com/notepad-plus-plus/notepad-plus-plus', '_blank')"><span>Notepad++ Project Page</span></div>
+            <div class="menu-item" onclick="window.open('https://npp-user-manual.org/', '_blank')"><span>Notepad++ Online User Manual</span></div>
+            <div class="menu-item" onclick="window.open('https://community.notepad-plus-plus.org/', '_blank')"><span>Notepad++ Community (Forum)</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="customAlert('You are already running the latest version.')"><span>Update Notepad++</span></div>
+            <div class="menu-item" onclick="requireDesktop('Network Proxy Settings')"><span>Set Updater Proxy...</span></div>
+            <div class="divider"></div>
+            <div class="menu-item" onclick="showDebugInfo()"><span>Debug Info...</span></div>
+            <div class="menu-item" onclick="showAboutModal()"><span>About Notepad++</span><span class="hotkey">F1</span></div>
+        </div>
+    </div>
+</div>
+
+<div id="toolbar">
+    <div class="tool-btn" title="New" onclick="newTab()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/AlZbLEc.png" alt="New"></div>
+    <div class="tool-btn" title="Open" onclick="triggerFileOpen()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/pibJIeD.png" alt="Open"></div>
+    <div class="tool-btn" title="Save" onclick="saveCurrentFile()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/QmZSHsC.png" alt="Save"></div>
+    <div class="tool-btn" title="Save All" onclick="saveAllFiles()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/xkPpNt1.png" alt="Save All"></div>
+    <div class="tool-btn" title="Close" onclick="closeActiveTab()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/QNBwEkT.png" alt="Close"></div>
+    <div class="tool-btn" title="Close All" onclick="closeAllTabs()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/uEQVDND.png" alt="Close All"></div>
+    <div class="tool-btn" title="Print" onclick="window.print()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/5O7kDw2.png" alt="Print"></div>
+    <div class="vert-divider"></div>
+    <div class="tool-btn" title="Cut" onclick="document.execCommand('cut')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/oz4nKcu.png" alt="Cut"></div>
+    <div class="tool-btn" title="Copy" onclick="document.execCommand('copy')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/zsZFF1P.png" alt="Copy"></div>
+    <div class="tool-btn" title="Paste" onclick="document.execCommand('paste')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/QTOyLWb.png" alt="Paste"></div>
+    <div class="vert-divider"></div>
+    <div class="tool-btn" title="Undo" onclick="document.execCommand('undo')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/ieJsU8t.png" alt="Undo"></div>
+    <div class="tool-btn" title="Redo" onclick="document.execCommand('redo')"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/TBqBmKa.png" alt="Redo"></div>
+    <div class="vert-divider"></div>
+    <div class="tool-btn" title="Find" onclick="showFindModal(false)"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/Oej4Dml.png" alt="Find"></div>
+    <div class="tool-btn" title="Replace" onclick="showFindModal(true)"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/BPKHPid.png" alt="Replace"></div>
+    <div class="vert-divider"></div>
+    <div class="tool-btn" title="Zoom In" onclick="zoomEditor(1)"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/cqeDtMf.png" alt="Zoom In"></div>
+    <div class="tool-btn" title="Zoom Out" onclick="zoomEditor(-1)"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/zLKbvL0.png" alt="Zoom Out"></div>
+    <div class="vert-divider"></div>
+    <div class="tool-btn" title="Synchronize vertical scrolling"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/9dm9oC1.png" alt="Sync Vert"></div>
+    <div class="tool-btn" title="Synchronize horizontal scrolling"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/wfHMsv9.png" alt="Sync Horiz"></div>
+    <div class="vert-divider"></div>
+    <div class="tool-btn" title="Word Wrap" onclick="toggleWordWrap()" id="btn-word-wrap"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/4sCpjpe.png" alt="Word Wrap"></div>
+    <div class="tool-btn" title="Show all characters"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/EiyCRwB.png" alt="Show All Chars"></div>
+    <div class="tool-btn" title="Show indent guide" style="background-color: #d0e8ff; border: 1px solid #a0a0a0;" id="btn-line-num" onclick="toggleLineNumbers()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/7qo4TpS.png" alt="Indent Guide"></div>
+    <div class="vert-divider"></div>
+    <div class="tool-btn" title="Define your language"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/sAvABwd.png" alt="Language"></div>
+    <div class="tool-btn" title="Document Map"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/rju4SYE.png" alt="Doc Map"></div>
+    <div class="tool-btn" title="Document List"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/aJPISzB.png" alt="Doc List"></div>
+    <div class="tool-btn" title="Function List"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/m7yeZ6U.png" alt="Function List"></div>
+    <div class="tool-btn" title="Document as Workspace"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/IRwuQz2.png" alt="Workspace"></div>
+    <div class="vert-divider"></div>
+    <div class="tool-btn" title="Monitoring (tail -f)"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/Mn88Prq.png" alt="Tail"></div>
+    <div class="vert-divider"></div>
+    <div class="tool-btn" title="Start Recording" onclick="startMacroRecording()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/YETvyfq.png" alt="Record"></div>
+    <div class="tool-btn" title="Stop Recording" onclick="stopMacroRecording()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/jyuXmZz.png" alt="Stop"></div>
+    <div class="tool-btn" title="Playback" onclick="playbackMacro()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/Guh5yot.png" alt="Play"></div>
+    <div class="tool-btn" title="Run a macro multiple times..." onclick="runMacroMultiple()"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/DBj2Cnl.png" alt="Run Multiple"></div>
+    <div class="tool-btn" title="Save current recorded macro"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/j0lBrLd.png" alt="Save Macro"></div>
+</div>
+
+<div id="tabbar"></div>
+
+<div id="editor-container">
+    <div id="line-numbers">1</div>
+    <div id="code-wrapper">
+        <textarea id="editor" wrap="off" oninput="handleInput()" onkeyup="updateStatusBarCursor()" onclick="updateStatusBarCursor()" onscroll="syncScroll()" spellcheck="false"></textarea>
+        <pre id="highlighting" aria-hidden="true"><code class="language-none" id="highlighting-content"></code></pre>
+    </div>
+</div>
+
+<div id="statusbar">
+    <div class="sb-section" id="sb-type">Normal text file</div>
+    <div class="sb-section" id="sb-length">length : 0  lines : 1</div>
+    <div class="sb-section" id="sb-position">Ln : 1  Col : 1  Pos : 1</div>
+    <div class="sb-section" id="sb-eol">Windows (CR LF)</div>
+    <div class="sb-section" id="sb-encoding">UTF-8</div>
+    <div class="sb-section" id="sb-ins">INS</div>
+</div>
+
+<div id="msg-box-modal" class="modal" style="min-width: 320px; z-index: 4000;">
+    <div class="modal-header">
+        <span id="msg-box-title">Notepad++</span>
+        <button onclick="closeMsgBox(null)">✖</button>
+    </div>
+    <div class="modal-body">
+        <p id="msg-box-text" style="margin-bottom: 15px; white-space: pre-wrap; word-wrap: break-word; line-height: 1.4;"></p>
+        <div id="msg-box-input-container" style="display:none; margin-bottom: 15px;">
+            <input type="text" id="msg-box-input" style="width: 100%; padding: 4px; border: 1px solid #8e8f8f;">
+        </div>
+        <div class="actions" id="msg-box-actions" style="justify-content: center; margin-top: 10px;">
+            </div>
+    </div>
+</div>
+
+<div id="find-modal" class="modal">
+    <div class="modal-header">
+        <span id="find-modal-title">Find</span>
+        <button onclick="closeFindModal()">✖</button>
+    </div>
+    <div class="modal-body">
+        <div class="input-row">
+            <label>Find what:</label>
+            <input type="text" id="find-input">
+        </div>
+        <div class="input-row" id="replace-row" style="display:none;">
+            <label>Replace with:</label>
+            <input type="text" id="replace-input">
+        </div>
+        <div class="options">
+            <label><input type="checkbox" id="find-match-case"> Match case</label>
+            <label><input type="checkbox" id="find-wrap" checked> Wrap around</label>
+        </div>
+        <div class="actions">
+            <button onclick="doFindNext()">Find Next</button>
+            <button id="btn-replace" onclick="doReplace()" style="display:none;">Replace</button>
+            <button id="btn-replace-all" onclick="doReplaceAll()" style="display:none;">Replace All</button>
+        </div>
+    </div>
+</div>
+
+<div id="about-modal" class="modal" style="min-width: 300px;">
+    <div class="modal-header">
+        <span>About Notepad++ Clone</span>
+        <button onclick="closeAboutModal()">✖</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+        <h2 style="color: #0078d7; margin-bottom: 10px;">Notepad++ Web Clone</h2>
+        <p style="margin-bottom: 5px;">Built with HTML, CSS, and vanilla JS.</p>
+        <p style="margin-bottom: 15px;">Version 1.0 (Web Edition)</p>
+        <button onclick="closeAboutModal()" style="padding: 4px 20px; cursor: pointer;">OK</button>
+    </div>
+</div>
+
+<div id="pref-modal" class="modal" style="width: 500px;">
+    <div class="modal-header">
+        <span>Preferences</span>
+        <button onclick="closePrefModal()">✖</button>
+    </div>
+    <div class="modal-body" style="padding: 0;">
+        <div class="pref-container">
+            <div class="pref-sidebar">
+                <div class="pref-sidebar-item active">General</div>
+            </div>
+            <div class="pref-content">
+                <div class="pref-group">
+                    <span class="pref-group-title">Typography</span>
+                    <div class="input-row">
+                        <label>Font Size:</label>
+                        <input type="number" id="pref-font-size" value="14" onchange="changeFontSizePref()" style="width: 60px;">
+                    </div>
+                    <div class="input-row">
+                        <label>Font Family:</label>
+                        <select id="pref-font-family" onchange="changeFontFamilyPref()" style="flex-grow: 1; padding: 2px;">
+                            <option value="'Courier New', Courier, monospace">Courier New</option>
+                            <option value="'Consolas', 'Courier New', monospace">Consolas</option>
+                            <option value="'Lucida Console', Monaco, monospace">Lucida Console</option>
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <label>Tab Size:</label>
+                        <input type="number" id="pref-tab-size" value="4" min="1" max="16" onchange="changeTabSizePref()" style="width: 60px;">
+                    </div>
+                </div>
+                <div class="pref-group">
+                    <span class="pref-group-title">View Options</span>
+                    <label style="display:block; margin-bottom: 8px;">
+                        <input type="checkbox" id="pref-word-wrap" onchange="toggleWordWrap()"> Enable Word Wrap
+                    </label>
+                    <label style="display:block; margin-bottom: 8px;">
+                        <input type="checkbox" id="pref-line-numbers" onchange="toggleLineNumbers()" checked> Show Line Numbers (Gutter)
+                    </label>
+                    <label style="display:block; margin-bottom: 8px;">
+                        <input type="checkbox" id="pref-fullscreen" onchange="toggleFullScreen()"> Fullscreen Mode
+                    </label>
+                </div>
+                <div class="pref-group">
+                    <span class="pref-group-title">Editor Settings</span>
+                    <label style="display:block; margin-bottom: 8px;">
+                        <input type="checkbox" id="pref-spellcheck" onchange="toggleSpellCheck()"> Enable Spell Checker
+                    </label>
+                    <label style="display:block; margin-bottom: 8px;">
+                        <input type="checkbox" id="pref-statusbar" onchange="toggleStatusBar()" checked> Show Status Bar
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions" style="padding: 10px; background: #f0f0f0; border-top: 1px solid #ccc; margin-top: 0;">
+        <button onclick="closePrefModal()">Close</button>
+    </div>
+</div>
+
+<div id="shortcut-modal" class="modal" style="width: 500px;">
+    <div class="modal-header">
+        <span>Shortcut Mapper</span>
+        <button onclick="closeShortcutModal()">✖</button>
+    </div>
+    <div class="modal-body" style="max-height: 400px; overflow-y: auto; padding: 0;">
+        <table class="shortcut-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Shortcut</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>New</td><td>Ctrl+N</td></tr>
+                <tr><td>Open</td><td>Ctrl+O</td></tr>
+                <tr><td>Save</td><td>Ctrl+S</td></tr>
+                <tr><td>Save As</td><td>Ctrl+Alt+S</td></tr>
+                <tr><td>Save All</td><td>Ctrl+Shift+S</td></tr>
+                <tr><td>Close</td><td>Ctrl+W</td></tr>
+                <tr><td>Close All</td><td>Ctrl+Shift+W</td></tr>
+                <tr><td>Print</td><td>Ctrl+P</td></tr>
+                <tr><td>Undo</td><td>Ctrl+Z</td></tr>
+                <tr><td>Redo</td><td>Ctrl+Y</td></tr>
+                <tr><td>Cut</td><td>Ctrl+X</td></tr>
+                <tr><td>Copy</td><td>Ctrl+C</td></tr>
+                <tr><td>Paste</td><td>Ctrl+V</td></tr>
+                <tr><td>Delete</td><td>DEL</td></tr>
+                <tr><td>Select All</td><td>Ctrl+A</td></tr>
+                <tr><td>Find</td><td>Ctrl+F</td></tr>
+                <tr><td>Replace</td><td>Ctrl+H</td></tr>
+                <tr><td>Find Next</td><td>F3</td></tr>
+                <tr><td>Find Previous</td><td>Shift+F3</td></tr>
+                <tr><td>Go To</td><td>Ctrl+G</td></tr>
+                <tr><td>Toggle FullScreen</td><td>F11</td></tr>
+                <tr><td>Post-It</td><td>F12</td></tr>
+                <tr><td>Run</td><td>F5</td></tr>
+                <tr><td>Get PHP Help</td><td>Alt+F1</td></tr>
+                <tr><td>Wikipedia Search</td><td>Alt+F3</td></tr>
+                <tr><td>Playback Macro</td><td>Ctrl+Shift+P</td></tr>
+                <tr><td>Toggle RTL Text Direction</td><td>Ctrl+Alt+R</td></tr>
+                <tr><td>Toggle LTR Text Direction</td><td>Ctrl+Alt+L</td></tr>
+                <tr><td>About Notepad++</td><td>F1</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="actions" style="padding: 10px; background: #f0f0f0; border-top: 1px solid #ccc; margin-top: 0;">
+        <button onclick="closeShortcutModal()">Close</button>
+    </div>
+</div>
+
+<div id="cmd-modal" class="modal" style="width: 700px; max-width: 90vw;">
+    <div class="modal-header">
+        <span>Command Line Arguments</span>
+        <button onclick="closeCmdModal()">✖</button>
+    </div>
+    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+        <pre style="font-family: 'Courier New', Courier, monospace; font-size: 12px; white-space: pre-wrap; word-wrap: break-word; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">Usage:
+
+notepad++ [--help] [-multiInst] [-noPlugin] [-lLanguage] [-udl="My UDL Name"]
+[-LlangCode] [-nLineNumber] [-cColumnNumber] [-pPosition] [-xLeftPos] [-yTopPos]
+[-monitor] [-nosession] [-notabbar] [-systemtray] [-loadingTime] [-alwaysOnTop]
+[-ro] [-fullReadOnly] [-fullReadOnlySavingForbidden] [-openSession] [-r]
+[-qn="Easter egg name" | -qt="a text to display." | -qf="D:\my quote.txt"]
+[-qSpeed1|2|3] [-quickPrint] [-settingsDir="d:\your settings dir\"]
+[-openFoldersAsWorkspace]  [-titleAdd="additional title bar text"]
+[filePath]
+
+--help: This help message
+-multiInst: Launch another Notepad++ instance
+-noPlugin: Launch Notepad++ without loading any plugin
+-l: Open file or Ghost type with syntax highlighting of choice
+-udl="My UDL Name": Open file by applying User Defined Language
+-L: Apply indicated localization, langCode is browser language code
+-n: Scroll to indicated line on filePath
+-c: Scroll to indicated column on filePath
+-p: Scroll to indicated position on filePath
+-x: Move Notepad++ to indicated left side position on the screen
+-y: Move Notepad++ to indicated top position on the screen
+-monitor: Open file with file monitoring enabled
+-nosession: Launch Notepad++ without previous session
+-notabbar: Launch Notepad++ without tab bar
+-ro: Make the filePath read-only
+-fullReadOnly: Open all files read-only by default, toggling the R/O off and saving is allowed
+-fullReadOnlySavingForbidden: Open all files read-only by default, toggling the R/O off and saving is disabled
+-systemtray: Launch Notepad++ directly in system tray
+-loadingTime: Display Notepad++ loading time
+-alwaysOnTop: Make Notepad++ always on top
+-openSession: Open a session. filePath must be a session file
+-r: Open files recursively. This argument will be ignored if filePath contains no wildcard character
+-qn="Easter egg name": Ghost type easter egg via its name
+-qt="text to display.": Ghost type the given text
+-qf="D:\my quote.txt": Ghost type a file content via the file path
+-qSpeed: Ghost typing speed. Value from 1 to 3 for slow, fast and fastest
+-quickPrint: Print the file given as argument then quit Notepad++
+-settingsDir="d:\your settings dir\": Override the default settings dir
+-openFoldersAsWorkspace: open filePath of folder(s) as workspace
+-titleAdd="string": add string to Notepad++ title bar
+filePath: file or folder name to open (absolute or relative path name)</pre>
+    </div>
+</div>
+    <script  src="./script.js"></script>
+
+  </body>
+  
+</html>
