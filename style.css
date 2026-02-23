@@ -240,7 +240,7 @@ body.distraction-free #df-exit-hint { display: block; }
 #line-numbers { 
     background-color: #e4e4e4; 
     color: #888; 
-    padding: 5px 5px 50vh 5px; 
+    padding: 5px 5px 400px 5px; /* Fixed integer padding instead of 50vh */
     text-align: right; 
     border-right: 1px solid #c0c0c0; 
     font-family: var(--editor-font-family) !important; 
@@ -294,7 +294,7 @@ body.distraction-free #df-exit-hint { display: block; }
     width: 100% !important; 
     height: 100% !important; 
     margin: 0 !important; 
-    padding: 5px 5px 50vh 5px !important; /* Allows scrolling past the end */
+    padding: 5px 5px 400px 5px !important; /* Fixed integer padding instead of 50vh */
     white-space: pre !important; 
     word-wrap: normal !important; 
     overflow-wrap: normal !important; 
