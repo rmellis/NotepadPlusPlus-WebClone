@@ -27,7 +27,7 @@ function closeMsgBox(result = null) {
 
 window.customAlert = function(msg) {
     return new Promise(resolve => {
-        document.getElementById('msg-box-title').textContent = 'Notepad++ Web';
+        document.getElementById('msg-box-title').textContent = 'Notepad++ Web Clone';
         document.getElementById('msg-box-text').textContent = msg;
         document.getElementById('msg-box-input-container').style.display = 'none';
         document.getElementById('msg-box-actions').innerHTML = `<button onclick="closeMsgBox(true)" style="padding: 4px 20px;">OK</button>`;
@@ -364,7 +364,7 @@ function setLanguage(lang) {
     let langDisplay = lang === 'none' ? 'Normal text file' : lang.toUpperCase() + ' source file';
     sbType.textContent = langDisplay;
     
-    document.title = `${currentTab.title} - Notepad++`;
+    document.title = `${currentTab.title} - Notepad++ Clone`;
 }
 
 // --- Encoding Management ---
@@ -377,7 +377,7 @@ function setEncoding(enc) {
     
     updateMenuCheckmarks('enc-check', enc);
     sbEncoding.textContent = enc;
-    document.title = `${currentTab.title} - Notepad++`;
+    document.title = `${currentTab.title} - Notepad++ Clone`;
 }
 
 function convertEncoding(enc) {
@@ -624,7 +624,7 @@ function renderTabs() {
     
     const activeTab = getActiveTab();
     if(activeTab) {
-        document.title = `${activeTab.isSaved ? '' : '*'}${activeTab.title} - Notepad++`;
+        document.title = `${activeTab.isSaved ? '' : '*'}${activeTab.title} - Notepad++ Clone`;
     }
 }
 
@@ -1678,3 +1678,15 @@ document.addEventListener('keydown', function(e) {
         closeActiveTab(); 
     }
 });
+
+// --- ZOOM WITH CTRL + SCROLL ---
+document.addEventListener('wheel', function(e) {
+    if (e.ctrlKey) {
+        e.preventDefault(); // Stop the whole page from zooming
+        if (e.deltaY < 0) {
+            zoomEditor(1);  // Scroll up = Zoom in
+        } else if (e.deltaY > 0) {
+            zoomEditor(-1); // Scroll down = Zoom out
+        }
+    }
+}, { passive: false });
