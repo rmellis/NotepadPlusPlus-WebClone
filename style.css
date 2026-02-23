@@ -240,7 +240,7 @@ body.distraction-free #df-exit-hint { display: block; }
 #line-numbers { 
     background-color: #e4e4e4; 
     color: #888; 
-    padding: 5px 5px 50vh 5px; /* Matches editor padding to keep scroll synced without extra numbers */
+    padding: 5px 5px 50vh 5px; 
     text-align: right; 
     border-right: 1px solid #c0c0c0; 
     font-family: var(--editor-font-family) !important; 
@@ -283,6 +283,8 @@ body.distraction-free #df-exit-hint { display: block; }
     direction: ltr !important;
     text-align: left !important;
     vertical-align: top !important; /* Forces fractional pixel alignment */
+    font-kerning: none !important;
+    font-variant-ligatures: none !important;
 }
 
 #editor, #highlighting { 
@@ -299,6 +301,7 @@ body.distraction-free #df-exit-hint { display: block; }
     border: none !important; 
     outline: none !important; 
     background: transparent !important;
+    overflow-anchor: none !important;
 }
 
 #wrap-measurer {
