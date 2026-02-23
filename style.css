@@ -295,7 +295,6 @@ body.distraction-free #df-exit-hint { display: block; }
     white-space: pre !important; 
     word-wrap: normal !important;
     overflow-wrap: normal !important;
-    overflow: auto !important; 
     border: none !important; 
     outline: none !important;
     background: transparent !important;
@@ -313,6 +312,7 @@ body.distraction-free #df-exit-hint { display: block; }
 }
 
 #editor { 
+    overflow: auto !important; /* Scrollbars allowed ONLY on the textarea */
     color: transparent !important; 
     caret-color: #000 !important; 
     z-index: 2 !important; 
@@ -320,6 +320,7 @@ body.distraction-free #df-exit-hint { display: block; }
 }
 
 #highlighting { 
+    overflow: hidden !important; /* Hides the ghost scrollbar! */
     z-index: 1 !important; 
     color: #000 !important; 
     pointer-events: none !important; 
