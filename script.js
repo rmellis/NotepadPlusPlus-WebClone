@@ -242,7 +242,15 @@ function syncScroll() {
     highlightingPre.scrollTop = editor.scrollTop;
     highlightingPre.scrollLeft = editor.scrollLeft;
     lineNumbers.scrollTop = editor.scrollTop;
+    
+    // CRITICAL CHROME FIX: If the text area scrolled further than the pre layer's max height, snap it back to match perfectly.
+    if (editor.scrollTop > highlightingPre.scrollTop) {
+        editor.scrollTop = highlightingPre.scrollTop;
+    }
 }
+
+// Ensure scroll events are tracked constantly on the mouse wheel, not just when typing
+editor.addEventListener('scroll', syncScroll);
 
 // CRITICAL FIX: The Exact-Height Block Mirror Engine
 function updateLineNumbers(text) {
