@@ -240,7 +240,7 @@ body.distraction-free #df-exit-hint { display: block; }
 #line-numbers { 
     background-color: #e4e4e4; 
     color: #888; 
-    padding: 5px; 
+    padding: 5px 5px 50vh 5px; /* Matches editor padding to keep scroll synced without extra numbers */
     text-align: right; 
     border-right: 1px solid #c0c0c0; 
     font-family: var(--editor-font-family) !important; 
@@ -272,7 +272,7 @@ body.distraction-free #df-exit-hint { display: block; }
     line-height: var(--editor-line-height) !important; 
     tab-size: var(--editor-tab-size) !important; 
     -moz-tab-size: var(--editor-tab-size) !important; 
-    -o-tab-size: var(--editor-tab-size) !important;
+    -o-tab-size: var(--editor-tab-size) !important; 
     letter-spacing: 0px !important;
     word-spacing: 0px !important;
     font-weight: 400 !important; 
@@ -282,6 +282,7 @@ body.distraction-free #df-exit-hint { display: block; }
     text-transform: none !important;
     direction: ltr !important;
     text-align: left !important;
+    vertical-align: top !important; /* Forces fractional pixel alignment */
 }
 
 #editor, #highlighting { 
@@ -291,12 +292,12 @@ body.distraction-free #df-exit-hint { display: block; }
     width: 100% !important; 
     height: 100% !important; 
     margin: 0 !important; 
-    padding: 5px !important; 
+    padding: 5px 5px 50vh 5px !important; /* Allows scrolling past the end */
     white-space: pre !important; 
-    word-wrap: normal !important;
-    overflow-wrap: normal !important;
+    word-wrap: normal !important; 
+    overflow-wrap: normal !important; 
     border: none !important; 
-    outline: none !important;
+    outline: none !important; 
     background: transparent !important;
 }
 
@@ -305,9 +306,9 @@ body.distraction-free #df-exit-hint { display: block; }
     visibility: hidden !important;
     z-index: -100 !important;
     top: 0 !important; 
-    left: 0 !important;
-    padding: 5px !important;
-    margin: 0 !important;
+    left: 0 !important; 
+    padding: 5px !important; 
+    margin: 0 !important; 
     border: none !important;
 }
 
