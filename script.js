@@ -875,6 +875,50 @@ function handleSessionLoad(event) {
 // FIND AND REPLACE ENGINE
 // ==========================================
 
+// NEW ENGINE: Mathematically forces the editor to scroll directly to the index without relying on browser focus
+function scrollToTarget(index) {
+    const wrapper = document.getElementById('code-wrapper');
+    const isWrap = wrapper.classList.contains('word-wrap');
+    const textBefore = editor.value.substring(0, index);
+    const linesBefore = textBefore.split('\n');
+    
+    const cs = window.getComputedStyle(editor);
+    const fontSize = parseFloat(cs.fontSize) || currentZoom;
+    const lh = fontSize * 1.5; 
+    
+    let targetTop = 0;
+    
+    if (!isWrap) {
+        targetTop = (linesBefore.length - 1) * lh;
+        // Approximate horizontal scroll for standard monospace text
+        const charWidth = fontSize * 0.602; 
+        const currentLineText = linesBefore[linesBefore.length - 1];
+        const targetLeft = currentLineText.length * charWidth;
+        editor.scrollLeft = Math.max(0, targetLeft - (editor.clientWidth / 2) + 50); 
+    } else {
+        let measurer = document.getElementById('wrap-measurer');
+        if (!measurer || measurer.children.length === 0) {
+            updateLineNumbers(editor.value);
+            measurer = document.getElementById('wrap-measurer');
+        }
+        
+        if (measurer && measurer.children.length >= linesBefore.length) {
+            for (let i = 0; i < linesBefore.length - 1; i++) {
+                let h = measurer.children[i].offsetHeight;
+                let linesWrapped = Math.round(h / lh);
+                if (linesWrapped < 1) linesWrapped = 1;
+                targetTop += (linesWrapped * lh);
+            }
+        } else {
+            targetTop = (linesBefore.length - 1) * lh; 
+        }
+    }
+    
+    // Set scroll position to visually center the target line
+    editor.scrollTop = Math.max(0, targetTop - (editor.clientHeight / 2) + (lh / 2));
+    syncScroll();
+}
+
 function showFindModal(isReplace) {
     const modal = document.getElementById('find-modal');
     modal.style.display = 'block';
@@ -920,8 +964,8 @@ function doFindNext() {
     if (index !== -1) {
         editor.focus();
         editor.setSelectionRange(index, index + query.length);
-        editor.blur(); 
-        editor.focus(); 
+        // FIXED: Replaced standard browser hack with mathematical precision scroll
+        scrollToTarget(index); 
     } else {
         customAlert(`Cannot find "${query}"`);
     }
@@ -1225,6 +1269,8 @@ async function goToLine() {
         }
         editor.focus();
         editor.setSelectionRange(pos, pos);
+        // FIXED: Calls the same target scrolling engine
+        scrollToTarget(pos); 
     }
 }
 
