@@ -240,7 +240,7 @@ body.distraction-free #df-exit-hint { display: block; }
 #line-numbers { 
     background-color: #e4e4e4; 
     color: #888; 
-    padding: 5px 5px 400px 5px; /* Fixed integer padding instead of 50vh */
+    padding: 5px 5px 400px 5px; 
     text-align: right; 
     border-right: 1px solid #c0c0c0; 
     font-family: var(--editor-font-family) !important; 
@@ -282,7 +282,7 @@ body.distraction-free #df-exit-hint { display: block; }
     text-transform: none !important;
     direction: ltr !important;
     text-align: left !important;
-    vertical-align: top !important; /* Forces fractional pixel alignment */
+    vertical-align: top !important; 
     font-kerning: none !important;
     font-variant-ligatures: none !important;
 }
@@ -294,7 +294,7 @@ body.distraction-free #df-exit-hint { display: block; }
     width: 100% !important; 
     height: 100% !important; 
     margin: 0 !important; 
-    padding: 5px 5px 400px 5px !important; /* Fixed integer padding instead of 50vh */
+    padding: 5px 5px 400px 5px !important; 
     white-space: pre !important; 
     word-wrap: normal !important; 
     overflow-wrap: normal !important; 
@@ -315,19 +315,24 @@ body.distraction-free #df-exit-hint { display: block; }
     border: none !important;
 }
 
+/* MODIFIED: Z-Index 1 (Bottom). Scrollbars forced to stay visible so width is perfectly synced */
 #editor { 
-    overflow: auto !important; /* Scrollbars allowed ONLY on the textarea */
+    overflow-y: scroll !important; 
+    overflow-x: auto !important; 
     color: transparent !important; 
     caret-color: #000 !important; 
-    z-index: 2 !important; 
+    z-index: 1 !important; 
     resize: none !important; 
 }
 
+/* MODIFIED: Z-Index 2 (Top). Shrunk by exactly 12px to protect the scrollbars from Chrome's bug */
 #highlighting { 
-    overflow: hidden !important; /* Hides the ghost scrollbar! */
-    z-index: 1 !important; 
+    overflow: hidden !important; 
+    z-index: 2 !important; 
     color: #000 !important; 
     pointer-events: none !important; 
+    width: calc(100% - 12px) !important; /* Perfectly clears the vertical scrollbar */
+    height: calc(100% - 12px) !important; /* Perfectly clears the horizontal scrollbar */
 }
 
 #highlighting-content { 
@@ -370,6 +375,16 @@ body.is-rtl-measurer #wrap-measurer * {
 }
 #editor::-webkit-scrollbar-thumb { 
     background: rgba(0,0,0,0.2); 
+}
+
+/* Solid background perfectly sitting behind the pristine syntax layer */
+#editor::selection {
+    background-color: #c9efd3; 
+    color: transparent !important;
+}
+#editor::-moz-selection {
+    background-color: #c9efd3; 
+    color: transparent !important;
 }
 
 /* FORBIDS PRISM FROM STRETCHING TEXT WITH BOLD FONTS */
