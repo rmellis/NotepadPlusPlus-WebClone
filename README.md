@@ -1,4 +1,4 @@
-# <img width="32" alt="icon" src="https://github.com/user-attachments/assets/97be996c-9358-413e-9c94-7476f3555194" /> Notepad++ Web site & Desktop App
+# <img width="32" alt="icon" src="https://github.com/user-attachments/assets/97be996c-9358-413e-9c94-7476f3555194" /> Notepad++ WebApp & Desktop App
 
 ### Welcome to *Notepad++ WebApp*.
 <img width="1790" height="607" alt="AppAndBrowserSideBySide" src="https://github.com/user-attachments/assets/adec8a8c-0b62-4668-ae76-058ad02b5552" />
@@ -6,6 +6,9 @@
 This application is a fully client-side web application designed to meticulously replicate the look, feel, and functionality of the classic Notepad++ desktop software within a browser sandbox. 
 
 While built primarily for the web, it also features a native desktop release for Windows, macOS, and Linux!
+<div align="center">
+  <a href="#"><img width="200" alt="dl" src="https://github.com/user-attachments/assets/5caa04e6-0e47-4eda-b173-f9aede5f480a" /></a>
+</div>
 <table>
   <tr align="center">
     <th colspan="2">Windows</th>
@@ -21,7 +24,7 @@ While built primarily for the web, it also features a native desktop release for
     <td><a href="https://github.com/rmellis/NotepadPlusPlus-WebClone/releases/download/Notepad%2B%2BV11_CrossPlatfoem-WebApp/Notepad++_Linux_Live.rpm"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/su823x6.png" width="50"><br>RPM (Live)</a><br><sub><i>120 MB</i></sub></td>
     <td><a href="https://github.com/rmellis/NotepadPlusPlus-WebClone/releases/download/Notepad%2B%2BV11_CrossPlatfoem-WebApp/Notepad++_Linux_Live.deb"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/iFiPHhe.png" width="50"><br>DEB (Live)</a><br><sub><i>90.1 MB</i></sub></td>
     <td><a href="https://github.com/rmellis/NotepadPlusPlus-WebClone/releases/download/Notepad%2B%2BV11_CrossPlatfoem-WebApp/Notepad++_Linux_Live.AppImage"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/KB1fVkn.png" width="50"><br>AppImage (Live)</a><br><sub><i>117 MB</i></sub></td>
-    <td><a href="https://rmellis.github.io/NotepadPlusPlus-WebClone/"><img src="https://api.iconify.design/lucide:globe.svg?color=teal" width="50"><br>Open Website</a><br><sub><i>Online</i></sub></td>
+    <td><a href="https://notepad-plus-plus.ywa.app/"><img src="https://api.iconify.design/lucide:globe.svg?color=teal" width="50"><br>Open Website</a><br><sub><i>Online</i></sub></td>
   </tr>
 
   <tr align="center">
@@ -32,6 +35,13 @@ While built primarily for the web, it also features a native desktop release for
     <td><a href="https://github.com/rmellis/NotepadPlusPlus-WebClone/releases/download/Notepad%2B%2BV11_CrossPlatfoem-WebApp/Notepad++_Linux_Offline.deb"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/ysp8YQh.png" width="50"><br>DEB (Offline)</a><br><sub><i>90.1 MB</i></sub></td>
     <td><a href="https://github.com/rmellis/NotepadPlusPlus-WebClone/releases/download/Notepad%2B%2BV11_CrossPlatfoem-WebApp/Notepad++_Linux_Offline.AppImage"><img src="https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/ZvOkb2J.png" width="50"><br>AppImage (Offline)</a><br><sub><i>117 MB</i></sub></td>
     <td></td> 
+  </tr>
+
+  <tr align="center">
+    <td colspan="7">
+      <br><b>🌐 Embed this WebApp on your own site:</b><br>
+      <code>&lt;iframe src="https://notepad-plus-plus.ywa.app/" width="100%" height="600px" style="border:none;"&gt;&lt;/iframe&gt;</code><br><br>
+    </td>
   </tr>
 </table>
 
