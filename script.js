@@ -17,6 +17,10 @@ let activeTabId = null;
 let fileCounter = 0;
 let currentZoom = 14; 
 
+// --- DEBOUNCE STATE ---
+let typingTimer;
+const doneTypingInterval = 500;
+
 // --- UNIVERSAL DIALOG ENGINE ---
 let msgBoxCallback = null;
 
@@ -214,28 +218,60 @@ function handleInput() {
     const text = editor.value;
     const currentTab = getActiveTab();
     
+    // 1. FAST UPDATES: Happen instantly
     currentTab.content = text;
+    updateStatusBarLength();
+    updateStatusBarCursor();
     
+    if (currentTab.isSaved) {
+        currentTab.isSaved = false;
+        renderTabs();
+    }
+
+    const lineCount = text.split('\n').length;
+
+    // 2. SMALL FILES: Process instantly
+    if (lineCount < 2000) {
+        clearTimeout(typingTimer);
+        applyHeavyFormatting(text);
+        return;
+    }
+
+    // 3. LARGE FILES: Push raw text to prevent invisible typing, calculate wrap, but delay Prism
+    let prismText = text;
+    if (prismText.endsWith('\n')) {
+        prismText += ' '; 
+    }
+    highlighting.textContent = prismText; 
+    updateLineNumbers(text); 
+    syncScroll();
+
+    // 4. DEBOUNCE PRISM: Wait half a second before injecting 10,000+ span tags
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+        if (typeof Prism !== 'undefined' && currentTab && currentTab.lang !== 'none') {
+            highlighting.className = `language-${currentTab.lang}`;
+            Prism.highlightElement(highlighting);
+        }
+    }, doneTypingInterval);
+}
+
+function applyHeavyFormatting(text) {
     let prismText = text;
     if (prismText.endsWith('\n')) {
         prismText += ' '; 
     }
     
     highlighting.textContent = prismText;
-    if (typeof Prism !== 'undefined') {
+    
+    const currentTab = getActiveTab();
+    if (typeof Prism !== 'undefined' && currentTab && currentTab.lang !== 'none') {
+        highlighting.className = `language-${currentTab.lang}`;
         Prism.highlightElement(highlighting);
     }
     
     updateLineNumbers(text);
-    updateStatusBarLength();
-    updateStatusBarCursor();
-    
     syncScroll();
-    
-    if (currentTab.isSaved) {
-        currentTab.isSaved = false;
-        renderTabs();
-    }
 }
 
 function syncScroll() {
@@ -243,30 +279,31 @@ function syncScroll() {
     highlightingPre.scrollLeft = editor.scrollLeft;
     lineNumbers.scrollTop = editor.scrollTop;
     
-    // CRITICAL CHROME FIX: If the text area scrolled further than the pre layer's max height, snap it back to match perfectly.
+    // CRITICAL CHROME FIX
     if (editor.scrollTop > highlightingPre.scrollTop) {
         editor.scrollTop = highlightingPre.scrollTop;
     }
 }
 
-// Ensure scroll events are tracked constantly on the mouse wheel, not just when typing
+// Ensure scroll events are tracked constantly
+editor.removeEventListener('scroll', syncScroll);
 editor.addEventListener('scroll', syncScroll);
 
-// CRITICAL FIX: The Exact-Height Block Mirror Engine
 function updateLineNumbers(text) {
     const lines = text.split('\n');
     const wrapper = document.getElementById('code-wrapper');
     const isWrap = wrapper.classList.contains('word-wrap');
     
-    // Ensure mathematically perfect line-height calculations from computed CSS
     const cs = window.getComputedStyle(editor);
     const fontSize = parseFloat(cs.fontSize) || currentZoom;
     const lh = fontSize * 1.5; 
     
     let numbersHtml = '';
     
-    // Fast path for non-word-wrap mode
+    // FAST PATH: Word Wrap is Off
     if (!isWrap) {
+        if (lineNumbers.children.length === lines.length) return; 
+        
         for (let i = 1; i <= lines.length; i++) { 
             numbersHtml += `<div style="height: ${lh}px; line-height: ${lh}px; display: flex; align-items: flex-start; justify-content: flex-end;">${i}</div>`; 
         }
@@ -274,7 +311,13 @@ function updateLineNumbers(text) {
         return;
     }
 
-    // --- WORD WRAP MEASUREMENT ENGINE ---
+    // FAILSAFE: Standard Word Wrap will crash browsers on massive files
+    if (isWrap && lines.length > 4000) {
+        lineNumbers.innerHTML = `<div style="padding-top:10px; font-size:10px; text-align:center; color:red;">Wrap disabled<br>for performance</div>`;
+        return; 
+    }
+
+    // EXACT DOM MEASUREMENT
     let measurer = document.getElementById('wrap-measurer');
     if (!measurer) {
         measurer = document.createElement('div');
@@ -282,7 +325,6 @@ function updateLineNumbers(text) {
         document.body.appendChild(measurer); 
     }
     
-    // Exact copy of Textarea computation styles to prevent sub-pixel drift
     measurer.style.position = 'fixed';
     measurer.style.visibility = 'hidden';
     measurer.style.top = '-9999px';
@@ -299,23 +341,20 @@ function updateLineNumbers(text) {
     measurer.style.letterSpacing = cs.letterSpacing;
     measurer.style.wordSpacing = cs.wordSpacing;
     
-    // Width must match clientWidth exactly to account for scrollbars
     measurer.style.width = editor.clientWidth + 'px';
     measurer.style.paddingLeft = cs.paddingLeft;
     measurer.style.paddingRight = cs.paddingRight;
     measurer.style.paddingTop = '0px';
     measurer.style.paddingBottom = '0px';
 
-    // Load lines into independent block-level dummy containers
     let dummyHtml = '';
     for (let i = 0; i < lines.length; i++) {
         let safeLine = lines[i].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        if (safeLine.length === 0) safeLine = ' '; // Empty lines still hold native height
+        if (safeLine.length === 0) safeLine = ' '; 
         dummyHtml += `<div style="display:block; width:100%;">${safeLine}</div>`;
     }
     measurer.innerHTML = dummyHtml;
 
-    // Measure the browser naturally assigned to each wrapped line
     const children = measurer.children;
     for (let i = 0; i < children.length; i++) {
         let h = children[i].offsetHeight;
@@ -350,6 +389,7 @@ function zoomEditor(direction) {
     const prefFontSize = document.getElementById('pref-font-size');
     if(prefFontSize) prefFontSize.value = currentZoom;
     
+    // Force rebuild line numbers
     updateLineNumbers(editor.value); 
     syncScroll(); 
 }
@@ -361,11 +401,8 @@ function setLanguage(lang) {
     if(!currentTab) return;
     
     currentTab.lang = lang;
-    highlighting.className = `language-${lang}`;
     
-    if (typeof Prism !== 'undefined') {
-        Prism.highlightElement(highlighting);
-    }
+    applyHeavyFormatting(currentTab.content);
     
     updateMenuCheckmarks('lang-check', lang);
     
@@ -465,19 +502,8 @@ function switchTab(id) {
     
     editor.value = tab.content;
     
-    let prismText = tab.content;
-    if (prismText.endsWith('\n')) {
-        prismText += ' ';
-    }
-    
-    highlighting.textContent = prismText;
-    highlighting.className = `language-${tab.lang}`;
-    
-    if (typeof Prism !== 'undefined') {
-        Prism.highlightElement(highlighting);
-    }
-    
-    updateLineNumbers(tab.content);
+    // Trigger the newly optimized rendering
+    applyHeavyFormatting(tab.content);
     
     updateMenuCheckmarks('enc-check', tab.encoding);
     updateMenuCheckmarks('lang-check', tab.lang);
@@ -875,7 +901,6 @@ function handleSessionLoad(event) {
 // FIND AND REPLACE ENGINE
 // ==========================================
 
-// NEW ENGINE: Mathematically forces the editor to scroll directly to the index without relying on browser focus
 function scrollToTarget(index) {
     const wrapper = document.getElementById('code-wrapper');
     const isWrap = wrapper.classList.contains('word-wrap');
@@ -890,7 +915,6 @@ function scrollToTarget(index) {
     
     if (!isWrap) {
         targetTop = (linesBefore.length - 1) * lh;
-        // Approximate horizontal scroll for standard monospace text
         const charWidth = fontSize * 0.602; 
         const currentLineText = linesBefore[linesBefore.length - 1];
         const targetLeft = currentLineText.length * charWidth;
@@ -898,6 +922,7 @@ function scrollToTarget(index) {
     } else {
         let measurer = document.getElementById('wrap-measurer');
         if (!measurer || measurer.children.length === 0) {
+            lineNumbers.innerHTML = '';
             updateLineNumbers(editor.value);
             measurer = document.getElementById('wrap-measurer');
         }
@@ -914,7 +939,6 @@ function scrollToTarget(index) {
         }
     }
     
-    // Set scroll position to visually center the target line
     editor.scrollTop = Math.max(0, targetTop - (editor.clientHeight / 2) + (lh / 2));
     syncScroll();
 }
@@ -964,7 +988,6 @@ function doFindNext() {
     if (index !== -1) {
         editor.focus();
         editor.setSelectionRange(index, index + query.length);
-        // FIXED: Replaced standard browser hack with mathematical precision scroll
         scrollToTarget(index); 
     } else {
         customAlert(`Cannot find "${query}"`);
@@ -987,6 +1010,7 @@ function doReplace() {
         if(!success) {
             editor.setRangeText(replacement, editor.selectionStart, editor.selectionEnd, 'end');
         }
+        
         handleInput();
     }
     doFindNext();
@@ -1269,7 +1293,6 @@ async function goToLine() {
         }
         editor.focus();
         editor.setSelectionRange(pos, pos);
-        // FIXED: Calls the same target scrolling engine
         scrollToTarget(pos); 
     }
 }
@@ -1292,8 +1315,8 @@ function duplicateCurrentLine() {
     if(!success) {
         editor.setRangeText(insertStr, lineEnd, lineEnd, 'end');
     }
-    handleInput();
     
+    handleInput();
     editor.setSelectionRange(start + insertStr.length, end + insertStr.length);
 }
 
@@ -1492,6 +1515,7 @@ function playbackMacro(isMulti = false) {
             }
         }
     });
+    
     handleInput();
 }
 
@@ -1744,6 +1768,7 @@ document.addEventListener('wheel', function(e) {
         }
     }
 }, { passive: false });
+
 /* =========================================================================
    WebApp Protection
    ========================================================================= */
